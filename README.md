@@ -31,8 +31,8 @@ Optionally, a comment can be included on the lines before the CSS block.
 
 Currently, this plugin:
 1. Searches for `@import`s in `<style>` blocks using regular expressions.
-2. Fetches note/file imports and removes their `@import` statements from the style block.
-3. Inserts the imported content at the beginning of the note.
+2. Fetches note/file imports and removes their `@import` statements from their parent style blocks.
+3. Inserts the imported content using a new `<style>` element.
 
 
 # Known issues
