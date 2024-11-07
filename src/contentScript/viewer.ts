@@ -4,6 +4,8 @@ declare const webviewApi: {
 	postMessage(contentScriptId: string, arg: unknown): Promise<any>;
 };
 
+const importedCssClassName = 'joplin-plugin-import-file-css--imported-css';
+
 const fixStyleImports = (style: HTMLStyleElement) => {
 	const importRegexes = [
 		/(?:^|[\n])\s*@import\s+"(.*)";/g,
@@ -44,11 +46,19 @@ const applyNoteCss = async (urls: string[]) => {
 		return;
 	}
 
-	const outputArea = document.querySelector('#rendered-md');
+	const outputArea = document.head;
+
+	// Remove old CSS
+	const oldImportedCss = outputArea.querySelectorAll(`.${importedCssClassName}`);
+	for (const style of oldImportedCss) {
+		style.remove();
+	}
+
 	for (const css of cssData) {
 		const style = document.createElement('style');
 		style.appendChild(document.createTextNode(css));
-		outputArea.insertAdjacentElement('afterbegin', style);
+		style.classList.add(importedCssClassName)
+		outputArea.appendChild(style);
 	}
 };
 
