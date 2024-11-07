@@ -5,7 +5,8 @@
     "dist": "webpack --env joplin-plugin-config=buildMain && webpack --env joplin-plugin-config=buildExtraScripts && webpack --env joplin-plugin-config=createArchive",
     "prepare": "npm run dist",
     "updateVersion": "webpack --env joplin-plugin-config=updateVersion",
-    "update": "npm install -g generator-joplin && yo joplin --node-package-manager npm --update --force"
+    "update": "npm install -g generator-joplin && yo joplin --node-package-manager npm --update --force",
+    "test": "tsx --test"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "glob": "^8.0.3",
     "tar": "^6.1.11",
     "ts-loader": "^9.3.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.4.3",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"

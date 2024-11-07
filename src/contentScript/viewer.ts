@@ -1,4 +1,5 @@
 import { contentScriptId } from "../constants";
+import extractCssPluginHandledImports from "./utils/extractCssPluginHandledImports";
 
 declare const webviewApi: {
 	postMessage(contentScriptId: string, arg: unknown): Promise<any>;
@@ -7,33 +8,15 @@ declare const webviewApi: {
 const importedCssClassName = 'joplin-plugin-import-file-css--imported-css';
 
 const fixStyleImports = (style: HTMLStyleElement) => {
-	const importRegexes = [
-		/(?:^|[\n])\s*@import\s+"(.*)";/g,
-		/(?:^|[\n])\s*@import\s+'(.*)';/g,
-		/(?:^|[\n])\s*@import\s+url\("(.*)"\);/g,
-		/(?:^|[\n])\s*@import\s+url\('(.*)'\);/g,
-	];
-
-	const removedUrls: string[] = [];
-
-	let styleContent = style.textContent;
-	for (const regex of importRegexes) {
-		styleContent = styleContent.replace(regex, (content, url: string) => {
-			// File and note links:
-			if (url.startsWith('file://') || url.startsWith('/') || url.startsWith(':/')) {
-				removedUrls.push(url);
-				// Remove: Imports are handled by the main script.
-				return '';
-			}
-			return content;
-		});
+	const styleContent = style.textContent;
+	const { updatedCss, extractedUrls } = extractCssPluginHandledImports(styleContent);
+	if (styleContent !== updatedCss) {
+		style.textContent = updatedCss;
 	}
-	style.textContent = styleContent;
-
-	return removedUrls;
+	return extractedUrls;
 };
 
-const removeInsertedCss = () => {
+const removeAllInsertedCss = () => {
 	const oldImportedCss = document.head.querySelectorAll(`.${importedCssClassName}`);
 	for (const style of oldImportedCss) {
 		style.remove();
@@ -55,7 +38,7 @@ const applyNoteCss = async (urls: string[]) => {
 
 	const outputArea = document.head;
 
-	removeInsertedCss();
+	removeAllInsertedCss();
 
 	for (const css of cssData) {
 		const style = document.createElement('style');
@@ -85,7 +68,7 @@ const replaceCssUrls = () => {
 			void applyNoteCss(cssUrls);
 		}, 70);
 	} else {
-		removeInsertedCss();
+		removeAllInsertedCss();
 	}
 };
 
