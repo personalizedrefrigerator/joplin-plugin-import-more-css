@@ -66,7 +66,7 @@ const replaceCssUrls = () => {
 		replaceCssTimeout = setTimeout(() => {
 			replaceCssTimeout = undefined;
 			void applyNoteCss(cssUrls);
-		}, 70);
+		}, 150);
 	} else {
 		removeAllInsertedCss();
 	}
