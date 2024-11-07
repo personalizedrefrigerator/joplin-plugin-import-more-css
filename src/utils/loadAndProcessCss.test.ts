@@ -52,6 +52,14 @@ describe('replaceImportsRecursive', () => {
 			}, '/start.css'),
 			textToCssImportStatement(importedFile),
 		);
+
+		strictEqual(
+			await testCssProcess({
+				'/test/start.css': '@import "../test.css";',
+				'/test.css': importedFile,
+			}, '/test/start.css'),
+			textToCssImportStatement(importedFile),
+		);
 	});
 
 	it('should resolve multiple same-line relative file imports', async () => {

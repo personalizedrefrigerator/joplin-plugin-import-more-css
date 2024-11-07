@@ -17,7 +17,7 @@ const loadAndProcessCss = async (
 	}
 
 	// Handle relative path imports:
-	if (cssUrl.startsWith('./')) {
+	if (cssUrl.startsWith('./') || cssUrl.startsWith('../')) {
 		const parentDirs = parentUrls.map(dirname);
 		cssUrl = resolve(...parentDirs, cssUrl);
 	}
