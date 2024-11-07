@@ -6,7 +6,6 @@ export default (_context: ContentScriptContext): MarkdownItContentScriptModule =
 		},
 
 		assets: () => ([
-			{ name: './viewer.css' },
 			{ name: './viewer.js' },
 		]),
 	}

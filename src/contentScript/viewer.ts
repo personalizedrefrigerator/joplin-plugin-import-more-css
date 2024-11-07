@@ -1,64 +1,81 @@
 import { contentScriptId } from "../constants";
-import { ContentScriptControl, PluginSettings } from "../types";
-import { setUpPagination } from "./setUpPagination";
-import { setUpToolbar } from "./setUpToolbar";
-import { PaginationController } from "./utils/makePaginated";
-
-
 
 declare const webviewApi: {
 	postMessage(contentScriptId: string, arg: unknown): Promise<any>;
 };
 
-const control: ContentScriptControl = {
-	setLastLocation: (noteId: string, location: number) => {
-		return webviewApi.postMessage(contentScriptId, {
-			location,
-			noteId,
-		});
-	},
-	getNoteAndLocation: () => {
-		return webviewApi.postMessage(contentScriptId, 'getLocation');
-	},
-	getSettings: function (): Promise<PluginSettings> {
-		return webviewApi.postMessage(contentScriptId, 'getSettings');
-	},
-	addOnSettingsChangeListener: (listener: () => void) => {
-		let removed = false;
-		void (async () => {
-			while (!removed) {
-				await webviewApi.postMessage(contentScriptId, 'waitForSettingsChange');
-				if (!removed) {
-					listener();
-				}
+const fixStyleImports = (style: HTMLStyleElement) => {
+	const importRegexes = [
+		/(?:^|[\n])\s*@import\s+"(.*)";/g,
+		/(?:^|[\n])\s*@import\s+'(.*)';/g,
+		/(?:^|[\n])\s*@import\s+url\("(.*)"\);/g,
+		/(?:^|[\n])\s*@import\s+url\('(.*)'\);/g,
+	];
+
+	const removedUrls: string[] = [];
+
+	let styleContent = style.textContent;
+	for (const regex of importRegexes) {
+		styleContent = styleContent.replace(regex, (content, url: string) => {
+			// File and note links:
+			if (url.startsWith('file://') || url.startsWith('/') || url.startsWith(':/')) {
+				removedUrls.push(url);
+				// Remove: Imports are handled by the main script.
+				return '';
 			}
-		})();
-
-		return {
-			remove: () => {
-				removed = true;
-			},
-		};
-	},
-	updateSettings: (settings: PluginSettings) => {
-		return webviewApi.postMessage(contentScriptId, {
-			newSettings: settings,
+			return content;
 		});
-	},
+	}
+	style.textContent = styleContent;
 
-	cacheScroll: () => {
-		if ('paginationController' in window) {
-			const paginationController = window.paginationController as PaginationController;
-			return paginationController?.getLocation() ?? -1;
-		}
-		return -1;
-	},
-	restoreScroll: (cacheKey) => {
-		if (cacheKey >= 0 && 'paginationController' in window) {
-			const paginationController = window.paginationController as PaginationController;
-			paginationController?.scrollLocationIntoView(cacheKey);
-		}
-	},
+	return removedUrls;
 };
-setUpPagination(control);
-setUpToolbar(control);
+
+let applyNoteCssCancelCounter = 0;
+const applyNoteCss = async (urls: string[]) => {
+	const cancelHandle = ++applyNoteCssCancelCounter;
+	const cssData = await webviewApi.postMessage(contentScriptId, {
+		kind: 'getCss',
+		urls,
+	});
+
+	// Cancelled?
+	if (cancelHandle !== applyNoteCssCancelCounter) {
+		return;
+	}
+
+	const outputArea = document.querySelector('#rendered-md');
+	for (const css of cssData) {
+		const style = document.createElement('style');
+		style.appendChild(document.createTextNode(css));
+		outputArea.insertAdjacentElement('afterbegin', style);
+	}
+};
+
+let replaceCssTimeout: undefined|ReturnType<typeof setTimeout> = undefined;
+
+const replaceCssUrls = () => {
+	const userStyles = document.querySelectorAll('#rendered-md style');
+	const cssUrls = [...userStyles]
+		.filter(style => style.textContent.includes('@import'))
+		.map(fixStyleImports)
+		.flat();
+
+	if (replaceCssTimeout) {
+		clearTimeout(replaceCssTimeout);
+		replaceCssTimeout = undefined;
+	}
+
+	if (cssUrls.length) {
+		replaceCssTimeout = setTimeout(() => {
+			replaceCssTimeout = undefined;
+			void applyNoteCss(cssUrls);
+		}, 70);
+	}
+};
+
+replaceCssUrls();
+
+document.addEventListener('joplin-noteDidUpdate', () => {
+	replaceCssUrls();
+});
