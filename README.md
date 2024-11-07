@@ -30,7 +30,7 @@ Optionally, a comment can be included on the lines before the CSS block.
 # How it works
 
 Currently, this plugin:
-1. Fearches for `@import`s in `<style>` blocks using regular expressions.
+1. Searches for `@import`s in `<style>` blocks using regular expressions.
 2. Fetches note/file imports and removes their `@import` statements from the style block.
 3. Inserts the imported content at the beginning of the note.
 
@@ -41,3 +41,6 @@ Currently, this plugin:
 
 1. `@import`s in multi-line comments are still imported.
 2. Using [CSS supports/layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@import) import options is unsupported.
+3. Does not support the Rich Text Editor.
+4. On mobile, does not allow importing CSS from files (only from other notes).
+5. Import failure errors may be logged to Joplin's console as a result of the original `@import` statements (before replacement).
