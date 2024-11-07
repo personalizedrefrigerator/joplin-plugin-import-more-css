@@ -1,3 +1,7 @@
+# 0.0.3
+
+- Fix CSS not removed after switching notes.
+
 # 0.0.2
 
 - Fix mobile support.
