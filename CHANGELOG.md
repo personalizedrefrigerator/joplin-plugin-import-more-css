@@ -1,3 +1,7 @@
+# 0.0.4, 0.0.5
+
+- Support recursive CSS note/file `@import`s.
+
 # 0.0.3
 
 - Fix CSS not removed after switching notes.
