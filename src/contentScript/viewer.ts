@@ -26,10 +26,17 @@ const removeAllInsertedCss = () => {
 let applyNoteCssCancelCounter = 0;
 const applyNoteCss = async (urls: string[]) => {
 	const cancelHandle = ++applyNoteCssCancelCounter;
-	const cssData = await webviewApi.postMessage(contentScriptId, {
-		kind: 'getCss',
-		urls,
-	});
+
+	let cssData;
+	try {
+		cssData = await webviewApi.postMessage(contentScriptId, {
+			kind: 'getCss',
+			urls,
+		});
+	} catch (error) {
+		console.error('CSS import error', error);
+		cssData = [];
+	}
 
 	// Cancelled?
 	if (cancelHandle !== applyNoteCssCancelCounter) {
