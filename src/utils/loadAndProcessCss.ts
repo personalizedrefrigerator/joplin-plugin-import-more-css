@@ -1,7 +1,7 @@
 import { cssImportRegexes } from "../constants";
 import canCustomImportCssUrl from "./canCustomImportCssUrl";
 import stringToBase64 from "./stringToBase64";
-import { resolve, dirname } from "path/posix";
+import { resolve, dirname } from "path";
 
 type FetchCssCallback = (url: string)=>Promise<string>;
 const loadAndProcessCss = async (
