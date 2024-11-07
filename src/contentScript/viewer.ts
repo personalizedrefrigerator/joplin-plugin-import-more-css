@@ -74,8 +74,6 @@ const replaceCssUrls = () => {
 	}
 };
 
-replaceCssUrls();
-
 document.addEventListener('joplin-noteDidUpdate', () => {
 	replaceCssUrls();
 });
