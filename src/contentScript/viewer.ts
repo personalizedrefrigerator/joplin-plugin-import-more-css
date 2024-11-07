@@ -33,6 +33,13 @@ const fixStyleImports = (style: HTMLStyleElement) => {
 	return removedUrls;
 };
 
+const removeInsertedCss = () => {
+	const oldImportedCss = document.head.querySelectorAll(`.${importedCssClassName}`);
+	for (const style of oldImportedCss) {
+		style.remove();
+	}
+};
+
 let applyNoteCssCancelCounter = 0;
 const applyNoteCss = async (urls: string[]) => {
 	const cancelHandle = ++applyNoteCssCancelCounter;
@@ -48,11 +55,7 @@ const applyNoteCss = async (urls: string[]) => {
 
 	const outputArea = document.head;
 
-	// Remove old CSS
-	const oldImportedCss = outputArea.querySelectorAll(`.${importedCssClassName}`);
-	for (const style of oldImportedCss) {
-		style.remove();
-	}
+	removeInsertedCss();
 
 	for (const css of cssData) {
 		const style = document.createElement('style');
@@ -81,6 +84,8 @@ const replaceCssUrls = () => {
 			replaceCssTimeout = undefined;
 			void applyNoteCss(cssUrls);
 		}, 70);
+	} else {
+		removeInsertedCss();
 	}
 };
 
