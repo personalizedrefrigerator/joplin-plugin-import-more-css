@@ -31,6 +31,7 @@ Optionally, a comment can be included on the lines before the CSS block.
 
 Currently, this plugin:
 1. Searches for `@import`s in `<style>` blocks using regular expressions.
+   - Although find-replace with regular expressions simplifies the implementation, it may cause issues if, for example, there are commented-out `@import`s. In the future, it may make sense to use a library like [csstree](https://github.com/csstree/csstree) to parse CSS and extract the imports.
 2. Fetches note/file imports and removes their `@import` statements from their parent style blocks.
 3. Inserts the imported content using a new `<style>` element.
 
