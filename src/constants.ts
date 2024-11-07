@@ -1,2 +1,2 @@
 
-export const contentScriptId = 'personalizedrefrigerator-extra-viewer-settings-content-script';
+export const contentScriptId = 'personalizedrefrigerator-local-css-imports-content-script';
