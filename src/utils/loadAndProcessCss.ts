@@ -13,7 +13,7 @@ const loadAndProcessCss = async (
 ) => {
 	// Base case: CSS already loaded (prevents infinite recursion).
 	if (parentUrls.includes(cssUrl)) {
-		return '';
+		return { cssText: '', errors: [ new Error('Warning: Cyclic import detected.') ] };
 	}
 
 	// Handle relative path imports:
@@ -21,7 +21,15 @@ const loadAndProcessCss = async (
 		const parentDirs = parentUrls.map(dirname);
 		cssUrl = resolve(...parentDirs, cssUrl);
 	}
-	let cssText = await fetchCssFromUrl(cssUrl);
+
+	let cssText;
+	let errors = [];
+	try {
+		cssText = await fetchCssFromUrl(cssUrl);
+	} catch (error) {
+		errors.push(error);
+		cssText = '';
+	}
 
 	const allUrls = new Set<string>();
 	for (const regex of cssImportRegexes) {
@@ -38,9 +46,9 @@ const loadAndProcessCss = async (
 	const originalUrlToUpdated: Map<string, string> = new Map();
 
 	await Promise.all([...allUrls].map(async url => {
-		const base64Url = stringToBase64(
-			await loadAndProcessCss(url, fetchCssFromUrl, [...parentUrls, cssUrl])
-		);
+		const processed = await loadAndProcessCss(url, fetchCssFromUrl, [...parentUrls, cssUrl]);
+		const base64Url = stringToBase64(processed.cssText);
+		errors.push(...processed.errors);
 
 		originalUrlToUpdated.set(url, `data:text/css;base64,${base64Url}`);
 	}));
@@ -55,7 +63,7 @@ const loadAndProcessCss = async (
 		});
 	}
 
-	return cssText;
+	return { cssText, errors };
 };
 
 export default loadAndProcessCss;

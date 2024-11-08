@@ -1,5 +1,5 @@
 import { contentScriptId } from "../constants";
-import extractCssPluginHandledImports from "./utils/extractCssPluginHandledImports";
+import canCustomImportCssUrl from "../utils/canCustomImportCssUrl";
 
 declare const webviewApi: {
 	postMessage(contentScriptId: string, arg: unknown): Promise<any>;
@@ -7,13 +7,26 @@ declare const webviewApi: {
 
 const importedCssClassName = 'joplin-plugin-import-file-css--imported-css';
 
-const fixStyleImports = (style: HTMLStyleElement) => {
-	const styleContent = style.textContent;
-	const { updatedCss, extractedUrls } = extractCssPluginHandledImports(styleContent);
-	if (styleContent !== updatedCss) {
-		style.textContent = updatedCss;
-	}
-	return extractedUrls;
+const extractIncompatibleImports = (style: HTMLStyleElement) => {
+	const importsToUpdate: CSSImportRule[] = [];
+	const collectIncompatibleImports = (styleSheet: CSSStyleSheet) => {
+		const rules = styleSheet.cssRules;
+
+		// 1. Find all incompatible @imports
+		for (let i = 0; i < rules.length; i ++) {
+			const rule = rules[i];
+
+			// Note: For now, this only supports toplevel imports:
+			if (rule instanceof CSSImportRule && canCustomImportCssUrl(rule.href)) {
+				importsToUpdate.push(rule);
+				styleSheet.deleteRule(i);
+				i --;
+			}
+		}
+	};
+	collectIncompatibleImports(style.sheet);
+
+	return importsToUpdate;
 };
 
 const removeAllInsertedCss = () => {
@@ -47,9 +60,13 @@ const applyNoteCss = async (urls: string[]) => {
 
 	removeAllInsertedCss();
 
-	for (const css of cssData) {
+	for (const { cssText, errors } of cssData) {
+		if (errors.length) {
+			console.warn('The following errors occurred while processing CSS imports:', errors);
+		}
+
 		const style = document.createElement('style');
-		style.appendChild(document.createTextNode(css));
+		style.appendChild(document.createTextNode(cssText));
 		style.classList.add(importedCssClassName)
 		outputArea.appendChild(style);
 	}
@@ -61,7 +78,7 @@ const replaceCssUrls = () => {
 	const userStyles = document.querySelectorAll('#rendered-md style');
 	const cssUrls = [...userStyles]
 		.filter(style => style.textContent.includes('@import'))
-		.map(fixStyleImports)
+		.map(extractIncompatibleImports)
 		.flat();
 
 	if (replaceCssTimeout) {
@@ -72,7 +89,7 @@ const replaceCssUrls = () => {
 	if (cssUrls.length) {
 		replaceCssTimeout = setTimeout(() => {
 			replaceCssTimeout = undefined;
-			void applyNoteCss(cssUrls);
+			void applyNoteCss(cssUrls.map(importStatement => importStatement.href));
 		}, 150);
 	} else {
 		removeAllInsertedCss();

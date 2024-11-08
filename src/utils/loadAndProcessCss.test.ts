@@ -2,8 +2,8 @@ import { describe, it } from 'node:test';
 import { strictEqual } from 'node:assert';
 import loadAndProcessCss from './loadAndProcessCss';
 
-const testCssProcess = (cssUrlToData: Record<string, string>, startUrl: string) => {
-	return loadAndProcessCss(startUrl, async (url) => {
+const testCssProcess = async(cssUrlToData: Record<string, string>, startUrl: string) => {
+	const processed = await loadAndProcessCss(startUrl, async (url) => {
 		if (!(url in cssUrlToData)) {
 			throw new Error(`Failed to fetch from ${JSON.stringify(url)} -- not found in ${
 				JSON.stringify(Object.keys(cssUrlToData))
@@ -11,6 +11,7 @@ const testCssProcess = (cssUrlToData: Record<string, string>, startUrl: string) 
 		}
 		return cssUrlToData[url];
 	});
+	return processed.cssText;
 };
 
 const toCssUrl = (cssText: string) => {

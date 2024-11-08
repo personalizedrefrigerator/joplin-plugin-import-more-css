@@ -11,6 +11,9 @@ const fetchNoteCss = async (url: string) => {
 };
 
 const fetchUrlText = async (url: string) => {
+	// Remove trailing query parameters (if any):
+	url = url.replace(/\.css\?.*?$/i, '.css');
+
 	if (!url.toLowerCase().endsWith('.css')) {
 		throw new Error(`Attempted to include non-CSS file: ${url}`);
 	}
