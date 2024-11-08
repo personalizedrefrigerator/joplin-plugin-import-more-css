@@ -1,3 +1,10 @@
+# 0.0.6
+
+- Improve error handling &mdash; import working CSS files even if an error occurs loading others.
+- Improve CSS parsing for in-note `<style>` elements.
+   - Commented-out `@import`s should now be ignored.
+   - This only applies to `<style>` blocks embedded directly within notes.
+
 # 0.0.4, 0.0.5
 
 - Support recursive CSS note/file `@import`s.
