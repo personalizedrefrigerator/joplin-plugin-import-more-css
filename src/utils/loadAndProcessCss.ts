@@ -4,16 +4,17 @@ import stringToBase64 from "./stringToBase64";
 import { resolve, dirname } from "path";
 
 type FetchCssCallback = (url: string)=>Promise<string>;
-const loadAndProcessCss = async (
+const loadAndProcessCssInternal = async (
 	cssUrl: string,
 	fetchCssFromUrl: FetchCssCallback,
-
-	// @internal
-	parentUrls: string[] = [],
+	parentUrls: string[],
+	errors: Error[],
+	imports: Map<string, string>,
 ) => {
 	// Base case: CSS already loaded (prevents infinite recursion).
 	if (parentUrls.includes(cssUrl)) {
-		return { cssText: '', errors: [ new Error('Warning: Cyclic import detected.') ] };
+		errors.push(new Error('Warning: Cyclic import detected.'));
+		return '';
 	}
 
 	// Handle relative path imports:
@@ -22,8 +23,11 @@ const loadAndProcessCss = async (
 		cssUrl = resolve(...parentDirs, cssUrl);
 	}
 
+	if (imports.has(cssUrl)) {
+		return imports.get(cssUrl);
+	}
+
 	let cssText;
-	let errors = [];
 	try {
 		cssText = await fetchCssFromUrl(cssUrl);
 	} catch (error) {
@@ -43,25 +47,46 @@ const loadAndProcessCss = async (
 		});
 	}
 
-	const originalUrlToUpdated: Map<string, string> = new Map();
-
+	const processedUrls = new Set<string>();
 	await Promise.all([...allUrls].map(async url => {
-		const processed = await loadAndProcessCss(url, fetchCssFromUrl, [...parentUrls, cssUrl]);
-		const base64Url = stringToBase64(processed.cssText);
-		errors.push(...processed.errors);
-
-		originalUrlToUpdated.set(url, `data:text/css;base64,${base64Url}`);
+		processedUrls.add(url);
+		await loadAndProcessCssInternal(
+			url, fetchCssFromUrl, [...parentUrls, cssUrl], errors, imports,
+		);
 	}));
-
 
 	for (const regex of cssImportRegexes) {
 		cssText = cssText.replace(regex, (fullMatch, url: string) => {
-			if (!originalUrlToUpdated.has(url)) return fullMatch;
-
-			const updatedUrl = originalUrlToUpdated.get(url);
-			return `@import url(${JSON.stringify(updatedUrl)});`;
+			if (!processedUrls.has(url)) {
+				return fullMatch;
+			} else {
+				return '';
+			}
 		});
 	}
+
+	imports.set(cssUrl, cssText.trim());
+	return cssText;
+}
+
+const loadAndProcessCss = async (
+	cssUrl: string,
+	fetchCssFromUrl: FetchCssCallback,
+) => {
+	const imports = new Map<string, string>();
+	const errors: Error[] = [];
+
+	const processedCss = await loadAndProcessCssInternal(cssUrl, fetchCssFromUrl, [], errors, imports);
+	imports.delete(cssUrl);
+
+	const cssText = [
+		...[...imports.values()].filter(data => !!data).map(cssData => {
+			const base64Data = stringToBase64(cssData);
+			const url = `data:text/css;base64,${base64Data}`;
+			return `@import url(${JSON.stringify(url)});`;
+		}),
+		processedCss,
+	].join('\n').trim();
 
 	return { cssText, errors };
 };

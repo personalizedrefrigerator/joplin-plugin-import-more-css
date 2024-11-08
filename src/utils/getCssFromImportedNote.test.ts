@@ -1,6 +1,5 @@
 import { describe, it } from 'node:test';
 import * as assert from 'node:assert';
-import extractCssPluginHandledImports from '../contentScript/utils/extractCssPluginHandledImports';
 import getCssFromImportedNote from './getCssFromImportedNote';
 
 describe('getCssFromImportedNote', () => {
