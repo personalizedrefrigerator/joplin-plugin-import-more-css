@@ -30,7 +30,7 @@ const extractIncompatibleImports = (style: HTMLStyleElement) => {
 };
 
 const removeAllInsertedCss = () => {
-	const oldImportedCss = document.head.querySelectorAll(`.${importedCssClassName}`);
+	const oldImportedCss = document.querySelectorAll(`.${importedCssClassName}`);
 	for (const style of oldImportedCss) {
 		style.remove();
 	}
@@ -56,7 +56,8 @@ const applyNoteCss = async (urls: string[]) => {
 		return;
 	}
 
-	const outputArea = document.head;
+	const preferredOutputArea = document.querySelector('#joplin-container-pluginAssetsContainer');
+	const outputArea = preferredOutputArea ?? document.body;
 
 	removeAllInsertedCss();
 
@@ -67,8 +68,8 @@ const applyNoteCss = async (urls: string[]) => {
 
 		const style = document.createElement('style');
 		style.appendChild(document.createTextNode(cssText));
-		style.classList.add(importedCssClassName)
-		outputArea.appendChild(style);
+		style.classList.add(importedCssClassName);
+		outputArea.insertAdjacentElement('afterend', style);
 	}
 };
 
