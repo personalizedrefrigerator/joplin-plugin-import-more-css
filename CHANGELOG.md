@@ -1,3 +1,8 @@
+# 0.0.7
+
+- Don't include commented out `@import`s in imported files.
+- Improve `@import` CSS precedence.
+
 # 0.0.6
 
 - Improve error handling &mdash; import working CSS files even if an error occurs loading others.
