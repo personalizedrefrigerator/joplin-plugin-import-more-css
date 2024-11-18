@@ -64,7 +64,7 @@ describe('replaceImportsRecursive', () => {
 	});
 
 	it('should resolve file imports relative to the current directory', async () => {
-		const importedFile = `/* Test! */`;
+		const importedFile = `* { color: orange; }`;
 		strictEqual(
 			await testCssProcess({
 				'/start.css': '@import "./test.css"; @import "./test.css";',
@@ -75,8 +75,8 @@ describe('replaceImportsRecursive', () => {
 	});
 
 	it('should allow multiple same-url relative imports that import different files', async () => {
-		const importedFile1 = `/* Test! */`;
-		const importedFile2 = `/* Test 2! */`;
+		const importedFile1 = `* { background: red; }`;
+		const importedFile2 = `* { color: red; }`;
 		strictEqual(
 			await testCssProcess({
 				'/start.css': '@import "./test.css"; @import "./example/index.css";',
@@ -89,7 +89,7 @@ describe('replaceImportsRecursive', () => {
 	});
 
 	it('should not re-import duplicate imports', async () => {
-		const importedFile = `/* Test! */`
+		const importedFile = `body { text-decoration: underline; }`;
 		strictEqual(
 			await testCssProcess({
 				'/start.css': '@import "./test.css"; @import "./test.css";',

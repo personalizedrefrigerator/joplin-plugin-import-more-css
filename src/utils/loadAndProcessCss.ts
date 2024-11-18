@@ -1,5 +1,6 @@
 import { cssImportRegexes } from "../constants";
 import canCustomImportCssUrl from "./canCustomImportCssUrl";
+import removeCssComments from "./removeCssComments";
 import stringToBase64 from "./stringToBase64";
 import { resolve, dirname } from "path";
 
@@ -24,7 +25,14 @@ const loadAndProcessCssInternal = async (
 	}
 
 	if (imports.has(cssUrl)) {
-		return imports.get(cssUrl);
+		const value = imports.get(cssUrl);
+
+		// Move the import to the end of `imports`. This makes it
+		// have higher precedence.
+		imports.delete(cssUrl);
+		imports.set(cssUrl, value);
+
+		return value;
 	}
 
 	let cssText;
@@ -34,6 +42,8 @@ const loadAndProcessCssInternal = async (
 		errors.push(error);
 		cssText = '';
 	}
+
+	cssText = removeCssComments(cssText);
 
 	const allUrls = new Set<string>();
 	for (const regex of cssImportRegexes) {
