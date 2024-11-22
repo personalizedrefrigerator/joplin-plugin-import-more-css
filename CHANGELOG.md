@@ -1,6 +1,6 @@
 # 0.0.8
 
-- Fix error export to PDF.
+- Fix error on export to PDF.
 
 # 0.0.7
 
