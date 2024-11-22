@@ -1,3 +1,7 @@
+# 0.0.8
+
+- Fix error export to PDF.
+
 # 0.0.7
 
 - Don't include commented out `@import`s in imported files.
