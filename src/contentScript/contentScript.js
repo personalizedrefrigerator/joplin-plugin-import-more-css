@@ -4,7 +4,7 @@ exports.default = () => {
 		},
 
 		assets: () => ([
-			{ name: './viewer.js' },
+			{ name: 'viewer.js' },
 		]),
 	}
 };
