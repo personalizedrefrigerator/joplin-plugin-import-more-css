@@ -40,8 +40,7 @@ Currently, this plugin:
 
 <div id="limitations"></div>
 
-1. `@import`s in multi-line comments are still imported.
-2. Using [CSS supports/layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@import) import options is unsupported.
-3. Does not support the Rich Text Editor.
-4. On mobile, does not allow importing CSS from files (only from other notes).
-5. Import failure errors may be logged to Joplin's console as a result of the original `@import` statements (before replacement).
+1. Using [CSS supports/layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@import) import options is unsupported.
+2. Does not support the Rich Text Editor.
+3. On mobile, does not allow importing CSS from files (only from other notes).
+4. Import failure errors may be logged to Joplin's console as a result of the original `@import` statements (before replacement).
