@@ -1,3 +1,8 @@
+# 1.0.0, 1.0.2
+
+- Publish to NPM.
+- Ran `npm audit fix`: Upgrade `tsx`, `braces`, `@esbuild/*`, `fill-range`, `micromatch`
+
 # 0.0.8
 
 - Fix error on export to PDF.

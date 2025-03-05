@@ -2,7 +2,7 @@
 	"manifest_version": 1,
 	"id": "io.github.personalizedrefrigerator.import-local-css",
 	"app_min_version": "3.0",
-	"version": "0.0.8",
+	"version": "1.0.2",
 	"name": "Import local CSS",
 	"description": "Adds support for local CSS @imports and @importing CSS from notes.",
 	"author": "Henry Heino",
