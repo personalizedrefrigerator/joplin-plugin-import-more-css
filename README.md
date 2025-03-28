@@ -1,6 +1,6 @@
 # Joplin Local CSS `@import`s
 
-This is a proof-of-concept plugin intended to address [this issue](https://discourse.joplinapp.org/t/local-imported-css-no-longer-accessible/41812).
+This is a [Joplin](https://joplinapp.org) plugin intended to address [this issue](https://discourse.joplinapp.org/t/local-imported-css-no-longer-accessible/41812).
 
 At present, it works by finding `@import`s in `<style>` blocks, then manually fetching and inserting the corresponding CSS file.
 
