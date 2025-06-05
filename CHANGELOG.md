@@ -1,3 +1,7 @@
+# 1.0.3
+
+- Fix plugin fails to replace CSS on iOS (#2).
+
 # 1.0.0, 1.0.2
 
 - Publish to NPM.
