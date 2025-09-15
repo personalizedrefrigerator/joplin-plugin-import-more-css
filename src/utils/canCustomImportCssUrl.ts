@@ -1,6 +1,6 @@
 
-// For now, require the .css extension:
-const cssFilePathExpression = /^(file:[/])?[.]{0,2}[/].*\.css$/i;
+// For now, require the .css extension, optionally followed by a query parameter:
+const cssFilePathExpression = /^(file:[/])?[.]{0,2}[/].*\.css(?:\?[^/\\]+)?$/i;
 
 /** Returns `true` iff `url` should be imported by this plugin (rather than by Joplin). */
 const canCustomImportCssUrl = (url: string) => {
