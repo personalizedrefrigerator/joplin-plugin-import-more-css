@@ -39,7 +39,7 @@ const loadAndProcessCssInternal = async (
 	try {
 		cssText = await fetchCssFromUrl(cssUrl);
 	} catch (error) {
-		console.warn('Failed to fetch CSS from ', cssUrl, 'error: ', error);
+		console.warn('Failed to fetch CSS from ', JSON.stringify(cssUrl), 'error: ', error);
 
 		errors.push(error);
 		cssText = '';
