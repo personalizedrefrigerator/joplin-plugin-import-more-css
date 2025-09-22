@@ -39,8 +39,6 @@ const loadAndProcessCssInternal = async (
 	try {
 		cssText = await fetchCssFromUrl(cssUrl);
 	} catch (error) {
-		console.warn('Failed to fetch CSS from ', JSON.stringify(cssUrl), 'error: ', error);
-
 		errors.push(error);
 		cssText = '';
 	}
@@ -81,10 +79,15 @@ const loadAndProcessCssInternal = async (
 	return cssText;
 }
 
+export interface CssResult {
+	cssText: string;
+	errors: Error[];
+}
+
 const loadAndProcessCss = async (
 	cssUrl: string,
 	fetchCssFromUrl: FetchCssCallback,
-) => {
+): Promise<CssResult> => {
 	const imports = new Map<string, string>();
 	const errors: Error[] = [];
 

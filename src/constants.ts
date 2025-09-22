@@ -11,4 +11,5 @@ export const cssImportRegexes = [
 
 export enum SettingKey {
 	GlobalCssNote = 'global-css-note',
+	LogImportFailures = 'log-import-failures',
 }

@@ -2,12 +2,16 @@ import joplin from "../../api";
 import getCssFromImportedNote from "./getCssFromImportedNote";
 
 const fetchNoteCss = async (url: string) => {
-	if (!url.startsWith(':/')) throw new Error('Invalid note URL');
+	if (!url.startsWith(':/')) throw new Error(`Invalid note URL: ${JSON.stringify(url)}.`);
 
 	const id = url.substring(2);
-	const note = await joplin.data.get(['notes', id], { fields: ['body'] });
-	let body: string = note.body;
-	return getCssFromImportedNote(body);
+	try {
+		const note = await joplin.data.get(['notes', id], { fields: ['body'] });
+		let body: string = note.body;
+		return getCssFromImportedNote(body);
+	} catch (error) {
+		throw new Error(`Failed to get CSS from note with ID ${JSON.stringify(id)}. Error: ${error}`);
+	}
 };
 
 const fetchUrlText = async (url: string) => {
