@@ -44,3 +44,9 @@ Currently, this plugin:
 2. Does not support the Rich Text Editor.
 3. On mobile, does not allow importing CSS from files (only from other notes).
 4. Import failure errors may be logged to Joplin's console as a result of the original `@import` statements (before replacement).
+
+# Settings
+
+## Global CSS note
+
+The "Global CSS note" setting allows using a note as CSS source for **all** Markdown notes. The "global CSS note" setting, if specified, should be a Markdown link to a note or a note ID. The linked-to note should contain a single CSS code block.

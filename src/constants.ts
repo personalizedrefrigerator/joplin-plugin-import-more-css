@@ -8,3 +8,7 @@ export const cssImportRegexes = [
 	/@import\s+url\('(.*?)'\);/g,
 	/@import\s+url\(\s*(.*?)\s*\);/g,
 ];
+
+export enum SettingKey {
+	GlobalCssNote = 'global-css-note',
+}
