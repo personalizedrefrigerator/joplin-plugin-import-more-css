@@ -1,3 +1,10 @@
+# 1.1.0
+
+- New setting: "Global CSS note" (in 482747b9b7b375ac1a462143e61df662c729c620).
+   - This is primarily to allow specifying global viewer CSS on mobile.
+- Mobile: Add advanced setting to enable including import errors in the plugin log file (in ebe095842fded3e5400293b882b0bc2b147c0fbd).
+- Allow importing CSS file paths that end in query parameters (in a4513c7c3dfb7ec47a37210245ed183405e5f0d2, fixes #3).
+
 # 1.0.3
 
 - Fix plugin fails to replace CSS on iOS (#2).
