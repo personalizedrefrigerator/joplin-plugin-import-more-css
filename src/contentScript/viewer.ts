@@ -121,10 +121,13 @@ const applyGlobalCss = debounce(async () => {
 	}
 });
 
-document.addEventListener('joplin-noteDidUpdate', () => {
+const main = () => {
 	replaceCssUrls();
 	applyGlobalCss();
-});
+};
 
-replaceCssUrls();
-applyGlobalCss();
+document.addEventListener('joplin-noteDidUpdate', main);
+
+document.addEventListener('DOMContentLoaded', main);
+
+main();
